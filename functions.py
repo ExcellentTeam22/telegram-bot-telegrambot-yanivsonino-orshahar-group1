@@ -5,7 +5,7 @@ def is_prime(number):
     """
     Check if the given number is prime or not.
     :param number: The given number.
-    :return: True if number is prime or False if number is not prime.
+    :return: 'Prime' if number is prime or 'Not prime', or custom message if number is odd.
     """
     if number > 1:
         if number % 2 == 0:
