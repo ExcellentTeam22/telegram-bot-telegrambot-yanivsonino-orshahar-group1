@@ -8,13 +8,15 @@ def is_prime(number):
     :return: True if number is prime or False if number is not prime.
     """
     if number > 1:
+        if number % 2 == 0:
+            return "Come on dude, you know even numbers are not prime!"
         for i in range(2, number // 2):
             if (number % i) == 0:
-                return False
+                return "Not prime"
         else:
-            return True
+            return "Prime"
     else:
-        return False
+        return "Not prime"
 
 
 def is_factorial(number):
