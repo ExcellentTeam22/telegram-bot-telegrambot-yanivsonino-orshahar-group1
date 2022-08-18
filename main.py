@@ -1,6 +1,7 @@
 
 import flask
 import requests
+import functions
 from flask import Flask, Response, request, redirect, url_for, json
 
 app = Flask(__name__)
@@ -57,20 +58,40 @@ def index():
     return "Done"
 
 
-def prime(message):
+def command(message):
     message = eval(message)
     chatid = message["chatid"]
-    if(len(message["text"].split()) == 2):
-        text = message["text"].split()[1]
-    else:
+
+    if len(message["text"].split()) == 2:
         text = "not good"
+    else:
+        text = dict_func[str(message["text"]).split()[0][1:]](message=message)
 
     payload = {
-        "text": "{} is Prime".format(text),
+        "text": text,
         "chat_id": chatid
     }
     resp = requests.get('https://api.telegram.org/bot{}/sendMessage?chat_id={}'.format(TOKEN, chatid), params=payload)
 
+
+def prime(message):
+    text = message["text"].split()[1]
+    return functions.is_prime(int(text))
+
+
+def factorial(message):
+    text = message["text"].split()[1]
+    return functions.is_factorial(int(text))
+
+
+def is_palindrome(message):
+    text = message["text"].split()[1]
+    return functions.is_palindrome(int(text))
+
+
+def is_perfect_square(message):
+    text = message["text"].split()[1]
+    return functions.is_perfect_square(int(text))
 
 
 dict_func = {"prime": prime}
