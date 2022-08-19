@@ -7,6 +7,7 @@ def is_prime(number):
     :param number: The given number.
     :return: 'Prime' if number is prime or 'Not prime', or custom message if number is odd.
     """
+    number = int(number)
     if number > 1:
         if number % 2 == 0:
             return "Come on dude, you know even numbers are not prime!"
@@ -25,6 +26,7 @@ def is_factorial(number):
     :param number: The given number.
     :return: True if number is factorial or False if not.
     """
+    number = int(number)
     i = 1
     while True:
         if number % i == 0:
@@ -56,8 +58,10 @@ def is_perfect_square(number):
     :param number: The given number.
     :return: True if the number has an integer square root or False if not.
     """
+    number = int(number)
     root = math.sqrt(number)
     if int(root + 0.5) ** 2 == number:
         return True
     else:
         return False
+

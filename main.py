@@ -2,10 +2,10 @@
 import flask
 import requests
 import functions
-from flask import Flask, Response, request, redirect, url_for, json
+from flask import Flask, request, json
 
 app = Flask(__name__)
-URL_PATH = 'https://ea0d-2a02-6680-1109-2107-954c-a186-7723-57c1.ngrok.io/'
+URL_PATH = 'https://e5aa-109-186-133-73.ngrok.io/'
 TOKEN = '5425657434:AAHu53vqfpE75iI7a0fzkYA5ibF7zq9zF5I'
 TELEGRAM_INIT_WEBHOOK_URL = 'https://api.telegram.org/bot{}/setWebhook?url={}message'.format(
     TOKEN, URL_PATH)
@@ -16,16 +16,7 @@ requests.get(TELEGRAM_INIT_WEBHOOK_URL)
 def sanity(): return "Server is running"
 
 
-# @app.route('/message', methods=["POST"])
-# def handle_message():
-#     print("got message")
-#     chat_id = request.get_json()['message']['chat']['id']
-#     res = requests.get(
-#         "https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'".format(TOKEN, chat_id, "Got it"))
-#     return Response("success")
-
-
-def sendmessage(chatid, text):
+def send_message(chatid, text):
     payload = {
         "text": text,
         "chat_id": chatid
@@ -34,67 +25,46 @@ def sendmessage(chatid, text):
 
 
 @app.route("/message", methods=["POST", "GET"])
-def index():
+def handle_message():
+    """
+    Handle message from user.
+    :return: Answer for the user.
+    """
     if (request.method == "POST"):
-        resp = request.get_json()
-        msgtext = resp["message"]["text"]
-
-        sendername = resp["message"]["from"]["first_name"]
-        chatid = resp["message"]["chat"]["id"]
+        chatid = ''
         try:
+            resp = request.get_json()
+            msgtext = resp["message"]["text"]
+            sendername = resp["message"]["from"]["first_name"]
+            chatid = resp["message"]["chat"]["id"]
             msgtype = resp["message"]["entities"][0]["type"]
+            if msgtype == "bot_command":
+                messages = json.dumps({"chatid": chatid, "text": msgtext})
+                command(message=messages)
+            else:
+                send_message(chatid, "use bot command")
+
         except:
-            sendmessage(chatid, "use bot command")
+            send_message(chatid, "No such command")
             return "NOT SUCCESS"
-        if msgtype == "bot_command":
-            messages = json.dumps({"chatid": chatid, "text": msgtext})
-            try:
-                dict_func[str(msgtext).split()[0][1:]](message=messages)
-            except:
-                sendmessage(chatid, "No such command")
-                return "NOT SUCCESS"
-        else:
-            sendmessage(chatid, "use bot command")
+
     return "Done"
 
 
 def command(message):
+    """
+    Check message data and sends information about the operation.
+    :param message: User message with the operation, and the args
+    :return: Information on the message.
+    """
     message = eval(message)
     chatid = message["chatid"]
 
     if len(message["text"].split()) == 2:
-        text = "not good"
+        text = dict_func[str(message["text"]).split()[0][1:]](message["text"].split()[1])
     else:
-        text = dict_func[str(message["text"]).split()[0][1:]](message=message)
-
-    payload = {
-        "text": text,
-        "chat_id": chatid
-    }
-    resp = requests.get('https://api.telegram.org/bot{}/sendMessage?chat_id={}'.format(TOKEN, chatid), params=payload)
-
-
-def prime(message):
-    text = message["text"].split()[1]
-    return functions.is_prime(int(text))
-
-
-def factorial(message):
-    text = message["text"].split()[1]
-    return functions.is_factorial(int(text))
-
-
-def is_palindrome(message):
-    text = message["text"].split()[1]
-    return functions.is_palindrome(int(text))
-
-
-def is_perfect_square(message):
-    text = message["text"].split()[1]
-    return functions.is_perfect_square(int(text))
-
-
-dict_func = {"prime": prime}
+        text = "Not good args"
+    send_message(chatid=chatid, text=text)
 
 @app.route("/setwebhook/")
 def setwebhook():
@@ -106,4 +76,8 @@ def setwebhook():
 
 
 if __name__ == '__main__':
+    dict_func = {"prime": functions.is_prime, "factorial": functions.is_factorial,
+                 "palindrome": functions.is_palindrome, "sqrt": functions.is_perfect_square}
     app.run(port=5002)
+
+
