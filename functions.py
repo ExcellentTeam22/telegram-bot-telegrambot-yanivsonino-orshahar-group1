@@ -46,8 +46,8 @@ def is_palindrome(string):
     :param string: The given string.
     :return: True if string is palindrome or False if not.
     """
-    for i in range(0, int(len(string)/2)):
-        if string[i] != string[len(string)-i-1]:
+    for i in range(0, int(len(string) / 2)):
+        if string[i] != string[len(string) - i - 1]:
             return False
     return True
 
@@ -65,3 +65,17 @@ def is_perfect_square(number):
     else:
         return False
 
+# def check_args(dic:dict):
+#     if len(dic.keys()) == 1:
+
+def help(*args):
+    """
+    help commands
+    :param args: none
+    :return str: Help menu.
+    """
+    return """Use the following commands
+    /help - Show commands
+    /add {COIN NAME} - To add coin
+    /check {COIN NAME} - Check coin 
+    """

@@ -5,7 +5,7 @@ import functions
 from flask import Flask, request, json
 
 app = Flask(__name__)
-URL_PATH = 'https://e5aa-109-186-133-73.ngrok.io/'
+URL_PATH = 'https://2c08-82-80-173-170.ngrok.io/'
 TOKEN = '5425657434:AAHu53vqfpE75iI7a0fzkYA5ibF7zq9zF5I'
 TELEGRAM_INIT_WEBHOOK_URL = 'https://api.telegram.org/bot{}/setWebhook?url={}message'.format(
     TOKEN, URL_PATH)
@@ -60,11 +60,12 @@ def command(message):
     message = eval(message)
     chatid = message["chatid"]
 
-    if len(message["text"].split()) == 2:
-        text = dict_func[str(message["text"]).split()[0][1:]](message["text"].split()[1])
+    if len(message["text"].split()) < 3:
+        text = str(dict_func[str(message["text"]).split()[0][1:]](message["text"].split()[1]))
     else:
         text = "Not good args"
     send_message(chatid=chatid, text=text)
+
 
 @app.route("/setwebhook/")
 def setwebhook():
@@ -77,7 +78,7 @@ def setwebhook():
 
 if __name__ == '__main__':
     dict_func = {"prime": functions.is_prime, "factorial": functions.is_factorial,
-                 "palindrome": functions.is_palindrome, "sqrt": functions.is_perfect_square}
+                 "palindrome": functions.is_palindrome, "sqrt": functions.is_perfect_square, "help": functions.help()}
     app.run(port=5002)
 
 
