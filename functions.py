@@ -100,4 +100,4 @@ def json_extract(obj, key):
         return arr
 
     values = extract(obj, arr, key)
-    return values
+    return values[0]

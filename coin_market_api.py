@@ -25,5 +25,24 @@ def get_coin_price(coin_name):
         print(e)
 
 
+def get_gain_loss_value(coin_name, initial_value, investment):
+    """
+    Calculate the gain or loss value for the investment.
+    :param coin_name: The coin that was initially invested in.
+    :param initial_value: The initial value of the crypto.
+    :param investment: The amount of USD invested in the coin.
+    :return: The current gain or loss for the investment.
+    """
+    current_price = get_coin_price(coin_name)
+    print("current price is {}".format(current_price))
+    return investment * ((float(current_price) - initial_value) / initial_value) / 100
+
+
 # Driver code
-print(get_coin_price("bitcoin"))
+invest = 100
+previous_price = 21389.47
+gain_loss = get_gain_loss_value("bitcoin", previous_price, invest)
+print("You earned: " if gain_loss > 0 else "You lost: ")
+print("{0} ({0:.1%})".format(gain_loss, gain_loss))
+print("You had {0} and now you have {1}".format(invest, (gain_loss + invest)))
+
