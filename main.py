@@ -1,6 +1,8 @@
 
 import flask
 import requests
+
+import Database
 import functions
 from flask import Flask, request, json
 
@@ -37,14 +39,16 @@ def handle_message():
             msgtext = resp["message"]["text"]
             sendername = resp["message"]["from"]["first_name"]
             chatid = resp["message"]["chat"]["id"]
+            name = '{}{}'.format(resp["message"]['chat']['first_name'], resp["message"]['chat']['last_name'])
+
             msgtype = resp["message"]["entities"][0]["type"]
             if msgtype == "bot_command":
-                messages = json.dumps({"chatid": chatid, "text": msgtext})
+                messages = json.dumps({"chatid": chatid, "text": msgtext, 'name': name})
                 command(message=messages)
             else:
                 send_message(chatid, "use bot command")
 
-        except:
+        except Exception as e:
             send_message(chatid, "No such command")
             return "NOT SUCCESS"
 
@@ -58,13 +62,9 @@ def command(message):
     :return: Information on the message.
     """
     message = eval(message)
-    chatid = message["chatid"]
-
-    if len(message["text"].split()) < 3:
-        text = str(dict_func[str(message["text"]).split()[0][1:]](message["text"].split()[1]))
-    else:
-        text = "Not good args"
-    send_message(chatid=chatid, text=text)
+    chat_id = message["chatid"]
+    text = str(dict_func[str(message["text"]).split()[0][1:]](message))
+    send_message(chatid=chat_id, text=text)
 
 
 @app.route("/setwebhook/")
@@ -78,7 +78,9 @@ def setwebhook():
 
 if __name__ == '__main__':
     dict_func = {"prime": functions.is_prime, "factorial": functions.is_factorial,
-                 "palindrome": functions.is_palindrome, "sqrt": functions.is_perfect_square, "help": functions.help()}
+                 "palindrome": functions.is_palindrome, "sqrt": functions.is_perfect_square, "help": functions.help
+                 , "add": functions.add, 'check': functions.show_coins}
     app.run(port=5002)
+
 
 
