@@ -1,8 +1,6 @@
 from requests import Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
-from functions import json_extract
-
 
 def get_coin_price(coin_name):
     url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
@@ -38,6 +36,27 @@ def get_gain_loss_value(coin_name, initial_value, investment):
     return investment * ((float(current_price) - initial_value) / initial_value) / 100
 
 
+def json_extract(obj, key):
+    """Recursively fetch values from nested JSON."""
+    arr = []
+
+    def extract(obj, arr, key):
+        """Recursively search for values of key in JSON tree."""
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if isinstance(v, (dict, list)):
+                    extract(v, arr, key)
+                elif k == key:
+                    arr.append(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                extract(item, arr, key)
+        return arr
+
+    values = extract(obj, arr, key)
+    return values[0]
+
+
 # Driver code
 invest = 100
 previous_price = 21389.47
@@ -45,4 +64,3 @@ gain_loss = get_gain_loss_value("bitcoin", previous_price, invest)
 print("You earned: " if gain_loss > 0 else "You lost: ")
 print("{0} ({0:.1%})".format(gain_loss, gain_loss))
 print("You had {0} and now you have {1}".format(invest, (gain_loss + invest)))
-

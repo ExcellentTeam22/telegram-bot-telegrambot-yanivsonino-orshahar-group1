@@ -1,9 +1,15 @@
+import asyncio
 import math
 
+import coin_market_api
 from Database import CoinsTable
 import pandas as pd
 
-#print(CoinsTable().print_coins('name-1891496051'))
+
+# print(CoinsTable().print_coins('name-1891496051'))
+res = {0: 'Not Added', 1: 'Added Successfully'}
+
+
 def is_prime(message: dict):
     """
     Check if the given number is prime or not.
@@ -56,8 +62,6 @@ def is_palindrome(message):
             return False
     return True
 
-def show_coins(message):
-    return CoinsTable().print_coins(message['name'])
 
 def is_perfect_square(message):
     """
@@ -76,19 +80,27 @@ def is_perfect_square(message):
 def add(message: dict):
     coin_name = message['text'].split()[1]
     invest_value = message['text'].split()[2]
-    if len(message['text'].split()) < 2:
-        curr_value = get_coin_curr_value(message['text'].split()[1])
+    if len(message['text'].split()) == 3:
+        curr_value = coin_market_api.get_coin_price(message['text'].split()[1])
     else:
         curr_value = int(message['text'].split()[3])
-    coins = float(curr_value) / float(invest_value)
+    coins = float(invest_value) / float(curr_value)
     current_data_frame = pd.DataFrame([[coin_name, invest_value, curr_value, coins]],
                                       columns=["Coin Name", "Invest", "First Value", 'Coins'])
-    res ={0: 'Not Added', 1: 'Added Successfully'}
     return res[CoinsTable().add_coin(current_data_frame, message['name'])]
 
+def delete(message: dict):
+    coin_id = message['text'].split()[1]
+    res[0] = 'Not deleted'
+    res[1] = 'Deleted'
+    return res[CoinsTable().delete_coin(message['name'], coin_id)]
 
-def get_coin_curr_value(coin_name: str):
-    return 100
+def close(message: dict):
+    CoinsTable().close_connection()
+
+
+def show_coins(message):
+    return CoinsTable().print_coins(message['name'])
 
 
 def help(message):
@@ -104,24 +116,3 @@ def help(message):
     notes:
     * is must argument
     """
-
-
-def json_extract(obj, key):
-    """Recursively fetch values from nested JSON."""
-    arr = []
-
-    def extract(obj, arr, key):
-        """Recursively search for values of key in JSON tree."""
-        if isinstance(obj, dict):
-            for k, v in obj.items():
-                if isinstance(v, (dict, list)):
-                    extract(v, arr, key)
-                elif k == key:
-                    arr.append(v)
-        elif isinstance(obj, list):
-            for item in obj:
-                extract(item, arr, key)
-        return arr
-
-    values = extract(obj, arr, key)
-    return values[0]

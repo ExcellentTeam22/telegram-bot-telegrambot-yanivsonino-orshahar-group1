@@ -49,7 +49,7 @@ def handle_message():
                 send_message(chatid, "use bot command")
 
         except Exception as e:
-            send_message(chatid, "No such command")
+            send_message(chatid, e.args)
             return "NOT SUCCESS"
 
     return "Done"
@@ -79,7 +79,7 @@ def setwebhook():
 if __name__ == '__main__':
     dict_func = {"prime": functions.is_prime, "factorial": functions.is_factorial,
                  "palindrome": functions.is_palindrome, "sqrt": functions.is_perfect_square, "help": functions.help
-                 , "add": functions.add, 'check': functions.show_coins}
+                 , "add": functions.add, 'check': functions.show_coins, 'delete': functions.delete,'close':functions.close}
     app.run(port=5002)
 
 
